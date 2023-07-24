@@ -4,3 +4,6 @@
   
 # papermint
 A Compiler For My Own Programming Language : papermint
+
+Currently in development. I am using Top Down Parsing (Recursive Descent Variant) with 1 symbol lookahead. 
+My goal is to implement parsing and code generation (for 64 bit windows and linux machines) from scratch (without any parser generator).

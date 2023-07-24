@@ -1,0 +1,23 @@
+P -> Stmnts
+
+Stmnts -> Stmnt Stmnts | ε
+
+Stmnt -> E NEWLINE | Assignment NEWLINE | Declaration NEWLINE
+
+Assignment -> Variable EQUAL Assignment | Variable EQUAL E
+
+Variable -> ID
+
+Declaration -> Type ID
+
+Type -> INT | DOUBLE
+
+E -> TE'
+
+E' -> ε | ADDOP TE'
+
+T -> FT'
+
+T' -> ε | MULOP FT'
+
+F -> NUM | (E) | Variable
