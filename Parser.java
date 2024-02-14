@@ -1,13 +1,12 @@
 class GrammerException extends Exception{
 
 }
-enum Token{
-    E,T,F,E_BAR,T_BAR,NUM,RIGHT_PAR,LEFT_PAR,ADDOP,MULOP,INT,DOUBLE,
-    P,STMNTS,STMNT,ID,ASSIGNMENT,VARIABLE,DECLARATION,NEWLINE,EQUAL
-}
 public class Parser{
     Token tokens[]={
-        Token.NUM,Token.MULOP,Token.NUM,Token.NEWLINE
+        new Token(TokenType.NUM,"3"),
+        new Token(TokenType.MULOP, "*"),
+        new Token(TokenType.NUM, "4"),
+        new Token(TokenType.NEWLINE, "\n"),
     };
     int token_pos=0;
     void print_grammer(String left,String right){
@@ -45,22 +44,22 @@ public class Parser{
     }
     void stmnt() throws GrammerException{
         Token next_token=peekNextToken();
-        if(next_token==Token.INT || next_token==Token.DOUBLE){
+        if(next_token.tokenType==TokenType.INT || next_token.tokenType==TokenType.DOUBLE){
             declaration();
-            match_terminal(Token.NEWLINE);
+            match_terminal(TokenType.NEWLINE);
         }
-        else if(next_token==Token.NUM || next_token==Token.LEFT_PAR){
+        else if(next_token.tokenType==TokenType.NUM || next_token.tokenType==TokenType.LEFT_PAR){
             e();
-            match_terminal(Token.NEWLINE);
+            match_terminal(TokenType.NEWLINE);
         }else{
             int current_token_pos=token_pos;
             try{
                 assignment();
-                match_terminal(Token.NEWLINE);
+                match_terminal(TokenType.NEWLINE);
             }catch(GrammerException ge){
                 token_pos=current_token_pos;
                 e();
-                match_terminal(Token.NEWLINE);
+                match_terminal(TokenType.NEWLINE);
             }
         }
     }
@@ -68,28 +67,28 @@ public class Parser{
         int current_token_pos=token_pos;
         try{
             variable();
-            match_terminal(Token.EQUAL);
+            match_terminal(TokenType.EQUAL);
             assignment();
         }catch(GrammerException ge){
             token_pos=current_token_pos;
             variable();
-            match_terminal(Token.EQUAL);
+            match_terminal(TokenType.EQUAL);
             e();
         }
     }
     void declaration() throws GrammerException{
         print_grammer("Declaration", "Type ID");
         type();
-        match_terminal(Token.ID);
+        match_terminal(TokenType.ID);
     }
     void type() throws GrammerException{
         Token next_token=peekNextToken();
-        if(next_token==Token.INT){
+        if(next_token.tokenType==TokenType.INT){
             print_grammer("Type", "INT");
-            match_terminal(Token.INT);
+            match_terminal(TokenType.INT);
         }else{
             print_grammer("Type", "DOUBLE");
-            match_terminal(Token.DOUBLE);
+            match_terminal(TokenType.DOUBLE);
         }
     }
     void e() throws GrammerException{
@@ -99,11 +98,11 @@ public class Parser{
     }
     void e_bar()throws GrammerException{
         Token next_token=peekNextToken();
-        if(next_token==Token.NEWLINE || next_token==Token.RIGHT_PAR){
+        if(next_token.tokenType==TokenType.NEWLINE || next_token.tokenType==TokenType.RIGHT_PAR){
             print_grammer("E\'", "empty");
         }else{
             print_grammer("E\'", "+TE\'");
-            match_terminal(Token.ADDOP);
+            match_terminal(TokenType.ADDOP);
             t();
             e_bar();
         }
@@ -115,25 +114,25 @@ public class Parser{
     }
     void t_bar() throws GrammerException{
         Token next_token=peekNextToken();
-        if(next_token==Token.ADDOP || next_token==Token.RIGHT_PAR || next_token==Token.NEWLINE){
+        if(next_token.tokenType==TokenType.ADDOP || next_token.tokenType==TokenType.RIGHT_PAR || next_token.tokenType==TokenType.NEWLINE){
             print_grammer("T\'", "empty");
         }
         else{
             print_grammer("T\'", "*FT\'");
-            match_terminal(Token.MULOP);
+            match_terminal(TokenType.MULOP);
             f();
             t_bar();
         }
     }
     void f() throws GrammerException{
-        if (peekNextToken()==Token.NUM){
+        if (peekNextToken().tokenType==TokenType.NUM){
             print_grammer("F", "NUMBER");
-            match_terminal(Token.NUM);
-        }else if(peekNextToken()==Token.LEFT_PAR){
+            match_terminal(TokenType.NUM);
+        }else if(peekNextToken().tokenType==TokenType.LEFT_PAR){
             print_grammer("F", "(E)");
-            match_terminal(Token.LEFT_PAR);
+            match_terminal(TokenType.LEFT_PAR);
             e();
-            match_terminal(Token.RIGHT_PAR);
+            match_terminal(TokenType.RIGHT_PAR);
         }
         else{
             print_grammer("F", "Variable");
@@ -141,10 +140,10 @@ public class Parser{
         }
     }
     void variable() throws GrammerException{
-        match_terminal(Token.ID);
+        match_terminal(TokenType.ID);
     }
-    void match_terminal(Token expected_token)throws GrammerException{
-        if (expected_token!=getNextToken())
+    void match_terminal(TokenType expected_token)throws GrammerException{
+        if (expected_token!=getNextToken().tokenType)
             throw new GrammerException();
         print_grammer(expected_token.toString(), expected_token.toString());
     }
