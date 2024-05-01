@@ -3,10 +3,45 @@ class GrammerException extends Exception{
 }
 public class Parser{
     Token tokens[]={
-        new Token(TokenType.NUM,"3"),
-        new Token(TokenType.MULOP, "*"),
-        new Token(TokenType.NUM, "4"),
-        new Token(TokenType.NEWLINE, "\n"),
+        // new Token(TokenType.NUM,"3"),
+        // new Token(TokenType.MULOP, "*"),
+        // new Token(TokenType.LEFT_PAR,"("),
+        // new Token(TokenType.NUM, "4"),
+        // new Token(TokenType.RIGHT_PAR, ")"),
+        // new Token(TokenType.NEWLINE, "\n"),
+        new Token(TokenType.INT,"INT"),
+        new Token(TokenType.ID,"x"),
+        new Token(TokenType.SEMICOLON,";"),
+        new Token(TokenType.DOUBLE,"DOUBLE"),
+        new Token(TokenType.ID,"y"),
+        new Token(TokenType.SEMICOLON,";"),
+        new Token(TokenType.ID,"x"),
+        new Token(TokenType.EQUAL,"="),
+        new Token(TokenType.NUM, "10"),
+        new Token(TokenType.SEMICOLON,";"),
+        new Token(TokenType.ID,"y"),
+        new Token(TokenType.EQUAL,"="),
+        new Token(TokenType.NUM,"3.14"),
+        new Token(TokenType.SEMICOLON,";"),
+        new Token(TokenType.INT,"INT"),
+        new Token(TokenType.ID,"z"),
+        new Token(TokenType.SEMICOLON,";"),
+        new Token(TokenType.ID,"z"),
+        new Token(TokenType.EQUAL,"="),
+        new Token(TokenType.ID,"x"),
+        new Token(TokenType.MULOP,"*"),
+        new Token(TokenType.LEFT_PAR,"("),
+        new Token(TokenType.ID,"y"),
+        new Token(TokenType.ADDOP,"+"),
+        new Token(TokenType.NUM,"2"),
+        new Token(TokenType.RIGHT_PAR,")"),
+        new Token(TokenType.SEMICOLON,";"),
+        new Token(TokenType.ID, "x"),
+        new Token(TokenType.EQUAL, "="),
+        new Token(TokenType.ID, "y"),
+        new Token(TokenType.EQUAL, "="),
+        new Token(TokenType.NUM, "10"),
+        new Token(TokenType.SEMICOLON, ";")
     };
     int token_pos=0;
     void print_grammer(String left,String right){
@@ -25,12 +60,14 @@ public class Parser{
         return null;
     }
     void p() throws GrammerException{
-        Token next_token=peekNextToken();
-        if(next_token==null){
-            print_grammer("P", "empty");
-        }else{
-            stmnts();
-        }
+        // Token next_token=peekNextToken();
+        // if(next_token==null){
+        //     print_grammer("P", "empty");
+        // }else{
+        //     stmnts();
+        // }
+        print_grammer("P", "Stmmts");
+        stmnts();
     }
     void stmnts() throws GrammerException{
         Token next_token=peekNextToken();
@@ -46,20 +83,20 @@ public class Parser{
         Token next_token=peekNextToken();
         if(next_token.tokenType==TokenType.INT || next_token.tokenType==TokenType.DOUBLE){
             declaration();
-            match_terminal(TokenType.NEWLINE);
+            match_terminal(TokenType.SEMICOLON);
         }
         else if(next_token.tokenType==TokenType.NUM || next_token.tokenType==TokenType.LEFT_PAR){
             e();
-            match_terminal(TokenType.NEWLINE);
+            match_terminal(TokenType.SEMICOLON);
         }else{
             int current_token_pos=token_pos;
             try{
                 assignment();
-                match_terminal(TokenType.NEWLINE);
+                match_terminal(TokenType.SEMICOLON);
             }catch(GrammerException ge){
                 token_pos=current_token_pos;
                 e();
-                match_terminal(TokenType.NEWLINE);
+                match_terminal(TokenType.SEMICOLON);
             }
         }
     }
@@ -98,13 +135,22 @@ public class Parser{
     }
     void e_bar()throws GrammerException{
         Token next_token=peekNextToken();
-        if(next_token.tokenType==TokenType.NEWLINE || next_token.tokenType==TokenType.RIGHT_PAR){
-            print_grammer("E\'", "empty");
-        }else{
+        // if(next_token.tokenType==TokenType.NEWLINE || next_token.tokenType==TokenType.RIGHT_PAR){
+        //     print_grammer("E\'", "empty");
+        // }else{
+        //     print_grammer("E\'", "+TE\'");
+        //     match_terminal(TokenType.ADDOP);
+        //     t();
+        //     e_bar();
+        // }
+        if(next_token.tokenType == TokenType.ADDOP){
             print_grammer("E\'", "+TE\'");
             match_terminal(TokenType.ADDOP);
             t();
             e_bar();
+        }
+        else{
+            print_grammer("E\'", "empty");
         }
     }
     void t()throws GrammerException{
@@ -114,14 +160,22 @@ public class Parser{
     }
     void t_bar() throws GrammerException{
         Token next_token=peekNextToken();
-        if(next_token.tokenType==TokenType.ADDOP || next_token.tokenType==TokenType.RIGHT_PAR || next_token.tokenType==TokenType.NEWLINE){
-            print_grammer("T\'", "empty");
-        }
-        else{
+        // if(next_token.tokenType==TokenType.ADDOP || next_token.tokenType==TokenType.RIGHT_PAR || next_token.tokenType==TokenType.NEWLINE){
+        //     print_grammer("T\'", "empty");
+        // }
+        // else{
+        //     print_grammer("T\'", "*FT\'");
+        //     match_terminal(TokenType.MULOP);
+        //     f();
+        //     t_bar();
+        // }
+        if(next_token.tokenType == TokenType.MULOP){
             print_grammer("T\'", "*FT\'");
             match_terminal(TokenType.MULOP);
             f();
             t_bar();
+        }else{
+            print_grammer("T\'", "empty");
         }
     }
     void f() throws GrammerException{
@@ -140,12 +194,13 @@ public class Parser{
         }
     }
     void variable() throws GrammerException{
+        print_grammer("Variable", "ID");
         match_terminal(TokenType.ID);
     }
     void match_terminal(TokenType expected_token)throws GrammerException{
         if (expected_token!=getNextToken().tokenType)
             throw new GrammerException();
-        print_grammer(expected_token.toString(), expected_token.toString());
+        // print_grammer(expected_token.toString(), expected_token.toString());
     }
     public void parse(){
         try{

@@ -2,7 +2,7 @@ P -> Stmnts
 
 Stmnts -> Stmnt Stmnts | ε
 
-Stmnt -> E NEWLINE | Assignment NEWLINE | Declaration NEWLINE
+Stmnt -> E SEMICOLON | Assignment SEMICOLON | Declaration SEMICOLON
 
 Assignment -> Variable EQUAL Assignment | Variable EQUAL E
 
